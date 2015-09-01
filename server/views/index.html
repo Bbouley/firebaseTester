@@ -25,16 +25,22 @@
 
     <h1>Login</h1>
 
-     <form action = '/users/login' method = 'post'>
+     <form action = '/user/login' method = 'post'>
       <div class="form-group">
         <label for="EmailInput">Email address</label>
-        <input type="email" class="form-control" id="login-email-input" placeholder="Email" name='login-email'>
+        <input type="email" class="form-control" id="login-email-input" placeholder="Email" name='loginEmail'>
       </div>
       <div class="form-group">
         <label for="password">Password</label>
-        <input type="password" class="form-control" id="login-password-input" placeholder="Password" name='login-password'>
+        <input type="password" class="form-control" id="login-password-input" placeholder="Password" name='loginPassword'>
       </div>
       <button type="submit" class="btn btn-default">Login</button>
+    </form>
+
+    <hr>
+
+    <form action= '/user/logout' method = 'post'>
+      <button type="submit" class="btn btn-default" id='logout'>Logout</button>
     </form>
 
     <hr>

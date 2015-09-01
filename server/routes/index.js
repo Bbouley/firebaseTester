@@ -3,15 +3,33 @@ var router = express.Router();
 var Firebase = require('firebase');
 
 var ref = new Firebase('https://luminous-inferno-872.firebaseio.com/');
-var peopleRef = ref.child('people');
+var userRef = ref.child('users');
+var indUserRef = null;
 var peopleArray = [];
+var uid = null;
 
-ref.on('value', function(snapshot){
+userRef.on('value', function(snapshot){
   console.log(snapshot.val());
 });
 
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Firebase Tester' });
+});
+
+router.post('/user/login', function(req, res, next){
+    ref.authWithPassword({
+    email    : req.body.loginEmail,
+    password : req.body.loginPassword
+  }, authHandler);
+    saveUser();
+    res.redirect('/');
+});
+
+router.post('/user/logout', function(req, res, next){
+  peopleArray = [];
+  ref.unauth();
+  console.log('logged out');
+  res.redirect('/');
 });
 
 router.post('/users', function(req, res, next){
@@ -28,12 +46,20 @@ router.post('/users', function(req, res, next){
 });
 
 router.post('/', function(req, res, next){
-  var name = req.body.name;
-  var age = req.body.age;
-  var person = new Person(name, age);
-  peopleArray.push(person);
-  peopleRef.set(peopleArray);
-  res.json(peopleArray);
+  if(uid !== null){
+    console.log(uid);
+    console.log(userRef.child(uid));
+    var name = req.body.name;
+    var age = req.body.age;
+    var person = new Person(name, age);
+    peopleArray.push(person);
+    indUserRef = userRef.child(uid);
+    indUserRefArray = indUserRef.child('people');
+    indUserRefArray.set(peopleArray);
+    res.json(peopleArray);
+  } else {
+    res.json('You\'re not logged in!!!');
+  }
 });
 
 module.exports = router;
@@ -42,4 +68,25 @@ var Person = function(name, age){
   this.name = name;
   this.age = age;
 };
+
+function authHandler(error, authData) {
+  if (error) {
+    console.log("Login Failed!", error);
+  } else {
+    console.log("Authenticated successfully with payload:", authData);
+  }
+}
+
+
+function saveUser(){
+  ref.onAuth(function(authData) {
+    if (authData) {
+      uid = authData.uid;
+      ref.child("users").child(authData.uid).set({
+        provider: authData.provider,
+        email: authData.password.email,
+      });
+    }
+  });
+}
 
