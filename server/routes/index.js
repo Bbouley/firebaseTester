@@ -4,7 +4,7 @@ var Firebase = require('firebase');
 
 var ref = new Firebase('https://luminous-inferno-872.firebaseio.com/');
 var userRef = ref.child('users');
-var indUserRef = null;
+// var indUserRef = null;
 var peopleArray = [];
 var uid = null;
 
@@ -27,6 +27,9 @@ router.post('/user/login', function(req, res, next){
 
 router.post('/user/logout', function(req, res, next){
   peopleArray = [];
+  uid = null;
+  indUserRef = null;
+  indUserRefArray = null;
   ref.unauth();
   console.log('logged out');
   res.redirect('/');
@@ -47,14 +50,12 @@ router.post('/users', function(req, res, next){
 
 router.post('/', function(req, res, next){
   if(uid !== null){
-    console.log(uid);
-    console.log(userRef.child(uid));
     var name = req.body.name;
     var age = req.body.age;
     var person = new Person(name, age);
     peopleArray.push(person);
-    indUserRef = userRef.child(uid);
-    indUserRefArray = indUserRef.child('people');
+    var indUserRef = userRef.child(uid);
+    var indUserRefArray = indUserRef.child('people');
     indUserRefArray.set(peopleArray);
     res.json(peopleArray);
   } else {
