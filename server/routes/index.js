@@ -6,7 +6,7 @@ var ref = new Firebase('https://luminous-inferno-872.firebaseio.com/');
 var userRef = ref.child('users');
 // var indUserRef = null;
 var peopleArray = [];
-var uid = null;
+
 
 userRef.on('value', function(snapshot){
   console.log(snapshot.val());
@@ -43,13 +43,16 @@ router.post('/users', function(req, res, next){
     if (error) {
       console.log("Error creating user:", error);
     } else {
-      res.status("Successfully created user account with uid:").json(userData.uid);
+      res.status("Successfully created user account with uid:").redirect('/');
     }
   });
 });
 
 router.post('/', function(req, res, next){
-  if(uid !== null){
+  var authData = ref.getAuth();
+  console.log(authData);
+  if(authData){
+    console.log('home get auth : ', authData);
     var name = req.body.name;
     var age = req.body.age;
     var person = new Person(name, age);
@@ -64,6 +67,8 @@ router.post('/', function(req, res, next){
 });
 
 module.exports = router;
+
+// *** helper functions *** //
 
 var Person = function(name, age){
   this.name = name;
